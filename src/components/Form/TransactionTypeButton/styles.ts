@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { RFValue } from "react-native-responsive-fontsize";
 import theme from "../../../global/styles/theme";
 
-interface IconsPops{
+interface IconsProps{
     type: 'up' | 'down';
 }
 

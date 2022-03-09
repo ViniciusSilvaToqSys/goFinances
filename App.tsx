@@ -16,6 +16,7 @@ import { CategorySelect } from './src/screens/CategorySelect';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { AppRoutes } from './src/routes/app.routes';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 //expo install expo-font @expo-google-fonts/poppins
 export default function App() {
@@ -31,10 +32,12 @@ if (!fontsLoaded){
 }
 
   return (
-    <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        <AppRoutes  />
-      </NavigationContainer>      
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1}}>
+      <ThemeProvider theme={theme}>
+        <NavigationContainer>
+          <AppRoutes  />
+        </NavigationContainer>      
+      </ThemeProvider>
+    </GestureHandlerRootView>
   )
 }
