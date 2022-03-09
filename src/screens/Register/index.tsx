@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useForm } from "react-hook-form";
 import { 
     Keyboard, 
@@ -7,6 +7,11 @@ import {
 } from "react-native";
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
+
+import uuid from 'react-native-uuid';
+
+//expo install @react-native-async-storage/async-storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 //npm install @hookform/resolvers yup
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -14,7 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 
 import { Button } from "../../components/Form/Button";
 import { CategorySelectButton } from "../../components/Form/CategorySelectButton";
-import { Input } from "../../components/Form/Input";
+
 //npm install react-hook-form
 import { InputForm } from "../../components/Form/InputForm";
 import { TransactionTypeButton } from "../../components/Form/TransactionTypeButton";
@@ -36,6 +41,8 @@ interface FormData {
    name: string;
    amount : string; 
 }
+
+const dataKey = '@gofinance:transaction';
 
 const schema = Yup.object().shape({
     name: Yup
@@ -77,7 +84,7 @@ export function Register(){
         setCategoryModalOpen(true);
     }
 
-    function handleRegister(form: FormData){
+    async function handleRegister(form: FormData){
         if (!transactionType)
             return Alert.alert('Selecione o tipo de transação');
 
@@ -86,14 +93,38 @@ export function Register(){
 
 
 
-        const data = {
+        const newTrasaction = {
+            id: String(uuid.v4()),
             name: form.name,
             amout: form.amount,
             transactionType,
-            category: category.key
+            category: category.key,
+            date: new Date()
         }
-        console.log(data);
+        
+        try{           
+            const data = await AsyncStorage.getItem(dataKey);
+            const currentData = data ? JSON.parse(data) : [];
+            // pega o que tinha e junta com o novo 
+            const dataFomatted = [
+                ...currentData,
+                newTrasaction
+
+            ];
+           await AsyncStorage.setItem(dataKey, JSON.stringify(dataFomatted));    
+        }catch(error) {
+            console.log(error);
+            Alert.alert("Não foi possivel salvar");
+        }
     }
+
+    useEffect(()=> {
+        async function loadData(){
+            const data1 = await AsyncStorage.getItem(dataKey);
+           console.log(JSON.parse(data1!));
+        }
+        loadData();
+    },[]);
 
     return (
         <TouchableWithoutFeedback 
