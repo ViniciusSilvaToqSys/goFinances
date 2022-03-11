@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import { HighLightCard } from "../../components/HighlightCard";
 import { TransactionCard, TransactionCardProps } from "../../components/TransactionCard";
+import { format } from "date-fns";
+
+//expo install @react-native-async-storage/async-storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { 
     Container,
@@ -24,41 +28,60 @@ export interface DataListProps extends TransactionCardProps {
     id: string;
 }
 
-export function Dashboard (){
-    const data: DataListProps[] =[{
-        id: '1',
-        type: "positive",
-        title:"Desenvolvimento de Site",
-        amount:"R$ 12.000,00",
-        category:{
-            name: "Vendas",
-            icon: "dollar-sign"
-        },
-        date: "13/04/2022",
-    },
-    {
-        id: '2',
-        type: "negative",
-        title:"Hamburger Pizzy",
-        amount:"R$ 59,00",
-        category:{
-            name: "Alimentação",
-            icon: "coffee"
-        },
-        date: "10/04/2022",
-    },
-    {
-        id: '3',
-        type: "negative",
-        title:"Aluguel do Apartamento",
-        amount:"R$ 1.200,00",
-        category:{
-            name: "Casa",
-            icon: "shopping-bag"
-        },
-        date: "08/04/2022",
+export function Dashboard (){    
+    const [data, setData] = useState<DataListProps>([]);
+
+    async function loadTrasactions(){
+        const dataKey = '@gofinance:transaction';
+        const response = await AsyncStorage.getItem(dataKey);
+        const trasactions = response ? JSON.parse(response) : [];
+
+        const transactionFomatted: DataListProps[] =  trasactions.
+            map((item: DataListProps) => {
+                
+                const amount = Number(item.amount)
+                    .toLocaleString('pt-Br', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+
+
+            //const amount = item.amount;
+                
+            const ndate = new Date(item.date);        
+            const date = format(ndate, "dd-MM-yy");
+            //const date = Intl.DateTimeFormat('pt-Br', {
+            //    day: '2-digit',
+            //    month: '2-digit',
+            //    year: '2-digit'
+            //}).format(new Date(item.date));
+
+            return {
+                id:item.id,
+                name: item.name,
+                amount,
+                date,
+                type: item.type,
+                category: item.category,
+            }
+
+
+        });
+
+        setData(transactionFomatted);
+
     }
-];
+
+    async function limparAsyncStorage(){
+        const dataKey = '@gofinance:transaction';
+        const response = await AsyncStorage.removeItem(dataKey); 
+    }
+
+     useEffect(()=> {
+        //limparAsyncStorage();
+        loadTrasactions();
+    },[]);
+
     return (
         <Container> 
             <Header>

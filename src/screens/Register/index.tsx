@@ -1,5 +1,4 @@
-import React, {useState, useEffect} from "react";
-import { useForm } from "react-hook-form";
+import React, {useState} from "react";
 import { 
     Keyboard, 
     Modal,     
@@ -7,8 +6,13 @@ import {
 } from "react-native";
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
-
+//npm install react-native-uuid
 import uuid from 'react-native-uuid';
+
+// do hook form
+import { useForm } from "react-hook-form";
+import { useNavigation } from "@react-navigation/native";
+
 
 //expo install @react-native-async-storage/async-storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,8 +46,6 @@ interface FormData {
    amount : string; 
 }
 
-const dataKey = '@gofinance:transaction';
-
 const schema = Yup.object().shape({
     name: Yup
     .string()
@@ -64,9 +66,12 @@ export function Register(){
         name: 'Categoria',
     });
 
+    const navigation = useNavigation();
+
     const {
         control,
         handleSubmit,
+        reset,
         formState: { errors }
     } = useForm({
         resolver: yupResolver(schema)
@@ -85,6 +90,7 @@ export function Register(){
     }
 
     async function handleRegister(form: FormData){
+        const dataKey = '@gofinance:transaction';
         if (!transactionType)
             return Alert.alert('Selecione o tipo de transação');
 
@@ -96,7 +102,7 @@ export function Register(){
         const newTrasaction = {
             id: String(uuid.v4()),
             name: form.name,
-            amout: form.amount,
+            amount: form.amount,
             transactionType,
             category: category.key,
             date: new Date()
@@ -111,20 +117,23 @@ export function Register(){
                 newTrasaction
 
             ];
-           await AsyncStorage.setItem(dataKey, JSON.stringify(dataFomatted));    
+           await AsyncStorage.setItem(dataKey, JSON.stringify(dataFomatted));  
+
+           reset(); // por causa do reack hook form, tem essa propriedade
+           setTransactionType('');
+           setCategory({
+               key: 'category',
+               name: 'Categoria'
+           });
+
+           navigation.navigate('Listagem');
+
+
         }catch(error) {
             console.log(error);
             Alert.alert("Não foi possivel salvar");
         }
     }
-
-    useEffect(()=> {
-        async function loadData(){
-            const data1 = await AsyncStorage.getItem(dataKey);
-           console.log(JSON.parse(data1!));
-        }
-        loadData();
-    },[]);
 
     return (
         <TouchableWithoutFeedback 

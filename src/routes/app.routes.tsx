@@ -6,6 +6,7 @@ const {Navigator, Screen} = createBottomTabNavigator();
 import { Dashboard } from "../screens/Dashboard";
 import { Register } from "../screens/Register";
 import { MaterialIcons } from '@expo/vector-icons';
+import { Platform } from "react-native";
 
 export function AppRoutes(){
     const theme = useTheme();

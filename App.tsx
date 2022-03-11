@@ -35,7 +35,7 @@ if (!fontsLoaded){
     <GestureHandlerRootView style={{ flex: 1}}>
       <ThemeProvider theme={theme}>
         <NavigationContainer>
-          <AppRoutes  />
+          <AppRoutes />
         </NavigationContainer>      
       </ThemeProvider>
     </GestureHandlerRootView>
