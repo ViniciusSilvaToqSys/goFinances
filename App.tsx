@@ -1,6 +1,7 @@
 import React from 'react';
 import { Register } from './src/screens/Register';
 import AppLoading from 'expo-app-loading';
+import { StatusBar } from 'react-native';
 
 import {
   useFonts,
@@ -35,6 +36,7 @@ if (!fontsLoaded){
     <GestureHandlerRootView style={{ flex: 1}}>
       <ThemeProvider theme={theme}>
         <NavigationContainer>
+          <StatusBar barStyle="light-content"/>
           <AppRoutes />
         </NavigationContainer>      
       </ThemeProvider>
